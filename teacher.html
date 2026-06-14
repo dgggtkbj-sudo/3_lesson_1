@@ -215,6 +215,8 @@ tbody td { padding: 10px 12px; vertical-align: middle; }
       <option value="성장과정">1차시 · 성장 과정</option>
       <option value="성격장단점">2차시 · 성격의 장단점</option>
       <option value="교내외활동">3차시 · 교내외 활동</option>
+      <option value="지원동기">4차시 · 지원 동기</option>
+      <option value="입사후포부">5차시 · 입사 후 포부</option>
     </select>
     <span class="last-updated" id="lastUpdated">로딩 중...</span>
     <button class="btn btn-refresh" onclick="loadData()">🔄 새로고침</button>
@@ -450,6 +452,54 @@ const LESSON_CONFIGS = {
     jobReasonLabel: '도움 설명',
     jobReasonField: '도움설명',
     excelPrefix: '교내외활동'
+  },
+  '지원동기': {
+    label: '4차시 · 지원 동기',
+    sheetName: '지원동기',
+    studentFile: 'student_4.html',
+    cols: [
+      { key:'w1', label:'관심계기',   field:'계기1' },
+      { key:'w2', label:'연결고리',   field:'연결1' },
+      { key:'w3', label:'이유·포부',  field:'이유1' }
+    ],
+    checklist: [
+      { label:'① 집중성', field:'집중성', sField:'집중성보완' },
+      { label:'② 차별성', field:'차별성', sField:'차별성보완' },
+      { label:'③ 실제성', field:'실제성', sField:'실제성보완' },
+      { label:'④ 연관성', field:'연관성', sField:'연관성보완' }
+    ],
+    writeBlocks: [
+      { title:'🔍 관심 계기·리서치',   fields:['계기1','계기2','계기3'] },
+      { title:'🔗 나와의 연결 고리',   fields:['연결1','연결2','연결3'] },
+      { title:'🎯 이유 + 포부',        fields:['이유1','이유2'] }
+    ],
+    jobReasonLabel: '핵심 이유',
+    jobReasonField: '핵심이유',
+    excelPrefix: '지원동기'
+  },
+  '입사후포부': {
+    label: '5차시 · 입사 후 포부',
+    sheetName: '입사후포부',
+    studentFile: 'student_5.html',
+    cols: [
+      { key:'w1', label:'1년계획',  field:'계획1' },
+      { key:'w2', label:'3~5년목표', field:'목표1' },
+      { key:'w3', label:'10년비전',  field:'비전1' }
+    ],
+    checklist: [
+      { label:'① 목적성', field:'목적성', sField:'목적성보완' },
+      { label:'② 근거성', field:'근거성', sField:'근거성보완' },
+      { label:'③ 단계성', field:'단계성', sField:'단계성보완' },
+      { label:'④ 공헌성', field:'공헌성', sField:'공헌성보완' }
+    ],
+    writeBlocks: [
+      { title:'📅 1년 내 할 것·보완', fields:['계획1','계획2','계획3'] },
+      { title:'🌏 3~5년 목표',       fields:['목표1','목표2'] },
+      { title:'🚀 10년 비전·기여',    fields:['비전1','비전2'] }
+    ],
+    jobReasonLabel: '1년 목표',
+    jobReasonField: '1년목표',
+    excelPrefix: '입사후포부'
   }
 };
 let currentLesson = '성장과정';
