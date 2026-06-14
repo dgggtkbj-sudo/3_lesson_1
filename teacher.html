@@ -209,8 +209,12 @@ tbody td { padding: 10px 12px; vertical-align: middle; }
 <body>
 
 <div class="header">
-  <h1>📊 자기소개서 성장 과정 — 교사 대시보드</h1>
+  <h1 id="dashTitle">📊 자기소개서 — 교사 대시보드</h1>
   <div class="header-actions">
+    <select id="lessonSelect" onchange="switchLesson()" style="padding:7px 14px;border-radius:20px;border:none;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;color:#1e3a32">
+      <option value="성장과정">1차시 · 성장 과정</option>
+      <option value="성격장단점">2차시 · 성격의 장단점</option>
+    </select>
     <span class="last-updated" id="lastUpdated">로딩 중...</span>
     <button class="btn btn-refresh" onclick="loadData()">🔄 새로고침</button>
     <button class="btn btn-excel"   onclick="exportExcel()">📥 제출현황 내보내기</button>
@@ -266,9 +270,9 @@ tbody td { padding: 10px 12px; vertical-align: middle; }
             <th class="sortable" onclick="sortBy('번호')">번호</th>
             <th class="sortable" onclick="sortBy('이름')">이름</th>
             <th class="sortable" data-col="job" onclick="sortBy('희망직업')">희망 직업</th>
-            <th data-col="w1">계기 (첫 줄)</th>
-            <th data-col="w2">경험·변화 (첫 줄)</th>
-            <th data-col="w3">직무 연결 (첫 줄)</th>
+            <th data-col="w1" id="th-w1">계기 (첫 줄)</th>
+            <th data-col="w2" id="th-w2">경험·변화 (첫 줄)</th>
+            <th data-col="w3" id="th-w3">직무 연결 (첫 줄)</th>
             <th>제출 상태</th>
             <th class="sortable" onclick="sortBy('타임스탬프')">제출 시각</th>
             <th>URL / 열기</th>
@@ -362,12 +366,69 @@ tbody td { padding: 10px 12px; vertical-align: middle; }
 <script>
 // ★ Apps Script URL — 실제 URL로 교체하세요
 const SCRIPT_URL   = "https://script.google.com/macros/s/AKfycbzzrhUcfFB9WMG6T5mRzT4tlcr4ItCnmiNLCYkAu8ETtd-aNeveJuhk90py2S4dw9WpVQ/exec";
-// ★ 학생 학습지 URL — GitHub Pages 주소로 고정
-const STUDENT_BASE = 'https://dgggtkbj-sudo.github.io/3_lesson_1/student.html';
+// ★ 학생 학습지 기본 경로 (GitHub Pages)
+const BASE_PATH = 'https://dgggtkbj-sudo.github.io/3_lesson_1/';
 
 // ★ Google Sheets 정보 — 실제 값으로 교체하세요
 const SHEET_ID     = '16i-3yRv85QFfPedqiPjVoV9MMsofYh2QhKBsKBkqKPs';
 const GID          = '0';
+
+/* ══ 차시별 설정 ══ */
+const LESSON_CONFIGS = {
+  '성장과정': {
+    label: '1차시 · 성장 과정',
+    sheetName: '성장과정',
+    studentFile: 'student.html',
+    cols: [
+      { key:'w1', label:'계기',     field:'계기1' },
+      { key:'w2', label:'경험·변화', field:'변화1' },
+      { key:'w3', label:'직무연결', field:'연결1' }
+    ],
+    checklist: [
+      { label:'① 주도성',     field:'주도성',  sField:'주도성보완' },
+      { label:'② 일관성',     field:'일관성',  sField:'일관성보완' },
+      { label:'③ 나만의 기준', field:'기준',   sField:'기준보완' },
+      { label:'④ 연결성',     field:'연결성', sField:'연결성보완' },
+      { label:'⑤ 발전성',     field:'발전성', sField:'발전성보완' }
+    ],
+    writeBlocks: [
+      { title:'🌱 계기',           fields:['계기1','계기2','계기3'] },
+      { title:'🔄 경험·변화',       fields:['변화1','변화2','변화3'] },
+      { title:'🎯 현재 나 + 직무 연결', fields:['연결1','연결2'] }
+    ],
+    jobReasonLabel: '선택 이유',
+    jobReasonField: '선택이유',
+    excelPrefix: '성장과정'
+  },
+  '성격장단점': {
+    label: '2차시 · 성격의 장단점',
+    sheetName: '성격장단점',
+    studentFile: 'student_2.html',
+    cols: [
+      { key:'w1', label:'장점',   field:'장점1' },
+      { key:'w2', label:'단점',   field:'단점1' },
+      { key:'w3', label:'극복노력', field:'극복1' }
+    ],
+    checklist: [
+      { label:'① 객관성',    field:'객관성',   sField:'객관성보완' },
+      { label:'② 내용 검증', field:'내용검증', sField:'내용검증보완' },
+      { label:'③ 발전성',    field:'발전성',   sField:'발전성보완' },
+      { label:'④ 적절성',    field:'적절성',   sField:'적절성보완' },
+      { label:'⑤ 현실성',    field:'현실성',   sField:'현실성보완' }
+    ],
+    writeBlocks: [
+      { title:'💚 장점 + 근거·에피소드', fields:['장점1','장점2','장점3'] },
+      { title:'⚠️ 단점 언급',          fields:['단점1','단점2'] },
+      { title:'🔄 극복노력 + 직무연결', fields:['극복1','극복2'] }
+    ],
+    jobReasonLabel: '연결 설명',
+    jobReasonField: '연결설명',
+    excelPrefix: '성격장단점'
+  }
+};
+let currentLesson = '성장과정';
+function cfg() { return LESSON_CONFIGS[currentLesson]; }
+function STUDENT_BASE() { return BASE_PATH + cfg().studentFile; }
 
 let allData       = [];
 let rosterData    = [];
@@ -386,11 +447,33 @@ function switchTab(name, el) {
   if (name === 'folder') renderFolders();
 }
 
+/* ══ 차시 전환 ══ */
+function applyLessonLabels() {
+  const c = cfg();
+  document.getElementById('dashTitle').textContent = `📊 자기소개서 ${c.label} — 교사 대시보드`;
+  document.getElementById('th-w1').textContent = c.cols[0].label + ' (첫 줄)';
+  document.getElementById('th-w2').textContent = c.cols[1].label + ' (첫 줄)';
+  document.getElementById('th-w3').textContent = c.cols[2].label + ' (첫 줄)';
+  document.getElementById('tog-w1').textContent = c.cols[0].label;
+  document.getElementById('tog-w2').textContent = c.cols[1].label;
+  document.getElementById('tog-w3').textContent = c.cols[2].label;
+}
+
+function switchLesson() {
+  currentLesson = document.getElementById('lessonSelect').value;
+  applyLessonLabels();
+  document.getElementById('searchBox').value = '';
+  currentSubTab = 'all';
+  document.querySelectorAll('#tab-submit .tab-btn').forEach((b,i) => b.classList.toggle('active', i===0));
+  resetColVisible();
+  loadData();
+}
+
 /* ══ 데이터 로드 (Apps Script 경유 JSONP) ══ */
 function loadData() {
   document.getElementById('lastUpdated').textContent = '불러오는 중...';
   const cb = '_load_' + Date.now();
-  const url = SCRIPT_URL + '?callback=' + cb + '&action=list&sheet=성장과정&t=' + Date.now();
+  const url = SCRIPT_URL + '?callback=' + cb + '&action=list&sheet=' + encodeURIComponent(cfg().sheetName) + '&t=' + Date.now();
 
   const timer = setTimeout(() => {
     cleanup();
@@ -579,9 +662,10 @@ function renderSubmitTable() {
 
   tbody.innerHTML = base.map((r,i) => {
     const d = r._data || {};
-    const w1 = (d['계기1']||'').substring(0,30) + ((d['계기1']||'').length>30?'…':'');
-    const w2 = (d['변화1']||'').substring(0,30) + ((d['변화1']||'').length>30?'…':'');
-    const w3 = (d['연결1']||'').substring(0,30) + ((d['연결1']||'').length>30?'…':'');
+    const c = cfg();
+    const w1 = (d[c.cols[0].field]||'').substring(0,30) + ((d[c.cols[0].field]||'').length>30?'…':'');
+    const w2 = (d[c.cols[1].field]||'').substring(0,30) + ((d[c.cols[1].field]||'').length>30?'…':'');
+    const w3 = (d[c.cols[2].field]||'').substring(0,30) + ((d[c.cols[2].field]||'').length>30?'…':'');
     return `<tr style="${!r._submitted?'background:#FFFAF7':''}">
       <td style="text-align:center"><span style="background:#E3F2FD;color:#1565C0;padding:2px 8px;border-radius:8px;font-weight:700;font-size:12px">${r['학년']||'—'}학년</span></td>
       <td style="text-align:center"><span style="background:#E8F5F0;color:#2E7D32;padding:2px 8px;border-radius:8px;font-weight:700;font-size:12px">${r['반']||'—'}반</span></td>
@@ -693,7 +777,7 @@ function toggleFolder(id) {
 
 /* ══ URL 헬퍼 ══ */
 function makeStudentURL(grade, cls, num, name) {
-  return `${STUDENT_BASE}?grade=${encodeURIComponent(grade)}&class=${encodeURIComponent(cls)}&number=${encodeURIComponent(num)}&name=${encodeURIComponent(name)}`;
+  return `${STUDENT_BASE()}?grade=${encodeURIComponent(grade)}&class=${encodeURIComponent(cls)}&number=${encodeURIComponent(num)}&name=${encodeURIComponent(name)}`;
 }
 function copyText(text) {
   navigator.clipboard.writeText(text).then(() => {
@@ -732,12 +816,12 @@ function makeURLSheet(students) {
 }
 function downloadClassURLs(cls) {
   const students = rosterData.filter(s => s['반'].toString()===cls.toString());
-  XLSX.writeFile(makeURLSheet(students), `${cls}반_성장과정URL.xlsx`);
+  XLSX.writeFile(makeURLSheet(students), `${cls}반_${cfg().excelPrefix}URL.xlsx`);
 }
-function downloadURLs()    { if (!previewData.length) return; XLSX.writeFile(makeURLSheet(previewData), '성장과정_URL목록.xlsx'); }
+function downloadURLs()    { if (!previewData.length) return; XLSX.writeFile(makeURLSheet(previewData), `${cfg().excelPrefix}_URL목록.xlsx`); }
 function downloadAllURLs() {
   if (!rosterData.length) { alert('명렬표를 먼저 등록해주세요.'); return; }
-  XLSX.writeFile(makeURLSheet(rosterData), '성장과정_전체URL목록.xlsx');
+  XLSX.writeFile(makeURLSheet(rosterData), `${cfg().excelPrefix}_전체URL목록.xlsx`);
 }
 
 /* ══ 파일 업로드 ══ */
@@ -834,36 +918,34 @@ function checkBadge(val) {
 
 function showDetailData(r) {
   if (!r) return;
-  document.getElementById('modalTitle').textContent = `${r['이름']||'학생'} — 성장 과정 상세`;
+  const c = cfg();
+  document.getElementById('modalTitle').textContent = `${r['이름']||'학생'} — ${c.label} 상세`;
+
+  const checklistHTML = c.checklist.map(item =>
+    `<div class="detail-row"><span class="detail-key">${item.label}</span>${checkBadge(r[item.field])}<span style="font-size:12px;color:#555;margin-left:8px">${r[item.sField]||''}</span></div>`
+  ).join('');
+
+  const writeBlocksHTML = c.writeBlocks.map(block =>
+    `<div class="detail-block">
+      <div class="detail-block-title">${block.title}</div>
+      ${block.fields.map(f=>r[f]).filter(Boolean).map(v=>`<div class="detail-block-line">• ${v}</div>`).join('') || '<div style="color:#aaa;font-size:12px">미작성</div>'}
+    </div>`
+  ).join('');
+
   document.getElementById('modalBody').innerHTML = `
     <div class="detail-section">
       <h4>📌 기본 정보</h4>
       <div class="detail-row"><span class="detail-key">학년·반·번호</span><span class="detail-val">${r['학년']||''}학년 ${r['반']||''}반 ${r['번호']||''}번</span></div>
       <div class="detail-row"><span class="detail-key">희망 직업</span><span class="detail-val">${r['희망직업']||'—'}</span></div>
-      <div class="detail-row"><span class="detail-key">선택 이유</span><span class="detail-val">${r['선택이유']||'—'}</span></div>
+      <div class="detail-row"><span class="detail-key">${c.jobReasonLabel}</span><span class="detail-val">${r[c.jobReasonField]||'—'}</span></div>
     </div>
     <div class="detail-section">
       <h4>✅ 체크포인트 자가진단</h4>
-      <div class="detail-row"><span class="detail-key">① 주도성</span>${checkBadge(r['주도성'])}<span style="font-size:12px;color:#555;margin-left:8px">${r['주도성보완']||''}</span></div>
-      <div class="detail-row"><span class="detail-key">② 일관성</span>${checkBadge(r['일관성'])}<span style="font-size:12px;color:#555;margin-left:8px">${r['일관성보완']||''}</span></div>
-      <div class="detail-row"><span class="detail-key">③ 나만의 기준</span>${checkBadge(r['기준'])}<span style="font-size:12px;color:#555;margin-left:8px">${r['기준보완']||''}</span></div>
-      <div class="detail-row"><span class="detail-key">④ 연결성</span>${checkBadge(r['연결성'])}<span style="font-size:12px;color:#555;margin-left:8px">${r['연결성보완']||''}</span></div>
-      <div class="detail-row"><span class="detail-key">⑤ 발전성</span>${checkBadge(r['발전성'])}<span style="font-size:12px;color:#555;margin-left:8px">${r['발전성보완']||''}</span></div>
+      ${checklistHTML}
     </div>
     <div class="detail-section">
       <h4>📝 나의 작성</h4>
-      <div class="detail-block">
-        <div class="detail-block-title">🌱 계기</div>
-        ${[r['계기1'],r['계기2'],r['계기3']].filter(Boolean).map(v=>`<div class="detail-block-line">• ${v}</div>`).join('') || '<div style="color:#aaa;font-size:12px">미작성</div>'}
-      </div>
-      <div class="detail-block">
-        <div class="detail-block-title">🔄 경험·변화</div>
-        ${[r['변화1'],r['변화2'],r['변화3']].filter(Boolean).map(v=>`<div class="detail-block-line">• ${v}</div>`).join('') || '<div style="color:#aaa;font-size:12px">미작성</div>'}
-      </div>
-      <div class="detail-block">
-        <div class="detail-block-title">🎯 현재 나 + 직무 연결</div>
-        ${[r['연결1'],r['연결2']].filter(Boolean).map(v=>`<div class="detail-block-line">• ${v}</div>`).join('') || '<div style="color:#aaa;font-size:12px">미작성</div>'}
-      </div>
+      ${writeBlocksHTML}
     </div>`;
   document.getElementById('detailModal').classList.add('show');
 }
@@ -877,14 +959,14 @@ function exportExcel() {
   const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `성장과정_제출현황_${new Date().toLocaleDateString('ko-KR').replace(/\. /g,'-').replace('.','')}.csv`;
+  a.download = `${cfg().excelPrefix}_제출현황_${new Date().toLocaleDateString('ko-KR').replace(/\. /g,'-').replace('.','')}.csv`;
   a.click();
 }
 
 /* ══ 초기화 ══ */
 const savedRoster = localStorage.getItem('growth_rosterData');
 if (savedRoster) { rosterData = JSON.parse(savedRoster); }
-document.addEventListener('DOMContentLoaded', function() { updateRosterDownloadUI(); });
+document.addEventListener('DOMContentLoaded', function() { updateRosterDownloadUI(); applyLessonLabels(); });
 loadData();
 setInterval(loadData, 60000);
 </script>
