@@ -214,6 +214,7 @@ tbody td { padding: 10px 12px; vertical-align: middle; }
     <select id="lessonSelect" onchange="switchLesson()" style="padding:7px 14px;border-radius:20px;border:none;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;color:#1e3a32">
       <option value="성장과정">1차시 · 성장 과정</option>
       <option value="성격장단점">2차시 · 성격의 장단점</option>
+      <option value="교내외활동">3차시 · 교내외 활동</option>
     </select>
     <span class="last-updated" id="lastUpdated">로딩 중...</span>
     <button class="btn btn-refresh" onclick="loadData()">🔄 새로고침</button>
@@ -424,6 +425,31 @@ const LESSON_CONFIGS = {
     jobReasonLabel: '연결 설명',
     jobReasonField: '연결설명',
     excelPrefix: '성격장단점'
+  },
+  '교내외활동': {
+    label: '3차시 · 교내외 활동',
+    sheetName: '교내외활동',
+    studentFile: 'student_3.html',
+    cols: [
+      { key:'w1', label:'활동',   field:'활동1' },
+      { key:'w2', label:'역할',   field:'역할1' },
+      { key:'w3', label:'배운점', field:'배운점1' }
+    ],
+    checklist: [
+      { label:'① 직접성', field:'직접성', sField:'직접성보완' },
+      { label:'② 개념성', field:'개념성', sField:'개념성보완' },
+      { label:'③ 의도성', field:'의도성', sField:'의도성보완' },
+      { label:'④ 의미성', field:'의미성', sField:'의미성보완' },
+      { label:'⑤ 연결성', field:'연결성', sField:'연결성보완' }
+    ],
+    writeBlocks: [
+      { title:'📋 활동 이름 + 기간',        fields:['활동1','활동2'] },
+      { title:'🎯 내가 맡은 역할',          fields:['역할1','역할2','역할3'] },
+      { title:'💡 배운점·느낀점 + 직무연결', fields:['배운점1','배운점2'] }
+    ],
+    jobReasonLabel: '도움 설명',
+    jobReasonField: '도움설명',
+    excelPrefix: '교내외활동'
   }
 };
 let currentLesson = '성장과정';
