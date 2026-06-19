@@ -1022,6 +1022,13 @@ function showDetailData(r) {
     <div class="detail-section">
       <h4>📝 나의 작성</h4>
       ${writeBlocksHTML}
+    </div>
+    <div class="detail-section">
+      <h4>✍️ 최종 통합 작성</h4>
+      ${r['통합작성']
+        ? `<div style="background:#f6fdfb;border:1.5px solid #90ccc0;border-radius:8px;padding:12px 14px;font-size:13px;line-height:1.8;color:#1a1a1a;white-space:pre-wrap">${r['통합작성']}</div>`
+        : '<div style="color:#aaa;font-size:12px">미작성</div>'
+      }
     </div>`;
   document.getElementById('detailModal').classList.add('show');
 }
