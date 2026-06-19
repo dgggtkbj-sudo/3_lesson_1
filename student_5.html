@@ -290,6 +290,25 @@ body {
 .modal-btn-close { background: #ece4f6; color: var(--mint); }
 .modal-btn-edit  { background: #FFB74D; color: #fff; }
 
+/* ── 통합 작성칸 ── */
+.total-wrap { margin: 8px 18px 12px; border: 2px solid #3a9070; border-radius: 8px; overflow: hidden; }
+.total-hdr {
+  background: linear-gradient(90deg, #3a9070, #3870b0);
+  padding: 7px 14px; font-size: 13px; font-weight: 800; color: #fff;
+  display: flex; align-items: center; gap: 8px;
+}
+.total-body { padding: 8px 14px 12px; background: #f6fdfb; }
+.total-label { font-size: 12px; color: #3a6050; margin-bottom: 6px; }
+.total-ta {
+  width: 100%; min-height: 80px;
+  border: 1.5px solid #90ccc0; border-radius: 8px;
+  background: #fff; font-size: 13px;
+  font-family: "Noto Sans KR", sans-serif; resize: vertical; outline: none;
+  color: #CC0000; line-height: 1.8; padding: 8px 12px;
+}
+.total-ta:focus { border-color: #3a9070; background: #f4fdf8; }
+.total-ta::placeholder { color: #b0ccc8; font-size: 12px; }
+
 /* ── 인쇄 ── */
 @media print {
   body { background: none; padding: 0; }
@@ -464,6 +483,17 @@ body {
     </div>
   </div>
 
+
+  <!-- 통합 작성칸 -->
+  <div class="total-wrap">
+    <div class="total-hdr">✍️ 최종 통합 작성 — 자기소개서 완성본</div>
+    <div class="total-body">
+      <div class="total-label">위에서 작성한 내용을 참고하여, 자연스럽게 이어지는 하나의 글로 완성해 보세요.</div>
+      <textarea id="w_total" class="total-ta" rows="6"
+        placeholder="1년 계획, 3~5년 목표, 10년 비전·기여를 자연스럽게 이어서 작성해 보세요..."
+        oninput="autoResize(this)"></textarea>
+    </div>
+  </div>
 </div><!-- /sheet -->
 
 <!-- 제출 완료 모달 -->
@@ -531,6 +561,7 @@ function getFormData() {
     w2_2: document.getElementById('w2_2').value,
     w3_1: document.getElementById('w3_1').value,
     w3_2: document.getElementById('w3_2').value,
+    w_total: document.getElementById('w_total').value,
   };
 }
 
@@ -552,6 +583,7 @@ function loadLocal() {
     w1_1:'w1_1', w1_2:'w1_2', w1_3:'w1_3',
     w2_1:'w2_1', w2_2:'w2_2',
     w3_1:'w3_1', w3_2:'w3_2',
+    w_total:'w_total',
   };
   Object.keys(map).forEach(function(id) {
     var el = document.getElementById(id);
@@ -594,6 +626,7 @@ function loadFromSheets() {
         w1_1:'계획1', w1_2:'계획2', w1_3:'계획3',
         w2_1:'목표1', w2_2:'목표2',
         w3_1:'비전1', w3_2:'비전2',
+        w_total:'통합작성',
       };
       Object.keys(m).forEach(function(id) {
         var el = document.getElementById(id), val = d[m[id]];
