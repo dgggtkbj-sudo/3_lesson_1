@@ -605,46 +605,48 @@ function loadFromSheets() {
   var chip = document.getElementById('statusChip');
   chip.textContent = '⏳ 불러오는 중...';
   return new Promise(function(resolve) {
-    var cb = '_cb' + Date.now();
     var url = SCRIPT_URL
-      + '?callback=' + cb
-      + '&grade='  + encodeURIComponent(params.get('grade')||'')
+      + '?grade='  + encodeURIComponent(params.get('grade')||'')
       + '&class='  + encodeURIComponent(params.get('class')||'')
       + '&number=' + encodeURIComponent(params.get('number')||'')
       + '&name='   + encodeURIComponent(params.get('name')||'')
-      + '&sheet='  + encodeURIComponent(SHEET_NAME)
+      + '&sheet=입사후포부'
       + '&t=' + Date.now();
-    window[cb] = function(json) {
-      delete window[cb];
-      var s = document.getElementById('_ss2'); if (s) s.remove();
-      var d = json && json.student;
-      if (!d) { chip.textContent='대기 중'; chip.className='status-chip'; resolve(false); return; }
-      var m = {
-        f_job:'희망직업', f_jobreason:'1년목표',
-        c1s:'목적성보완', c2s:'근거성보완', c3s:'단계성보완', c4s:'공헌성보완',
-        f_keywords:'단기목표메모', f_newexp:'중장기목표메모',
-        w1_1:'계획1', w1_2:'계획2', w1_3:'계획3',
-        w2_1:'목표1', w2_2:'목표2',
-        w3_1:'비전1', w3_2:'비전2',
-        w_total:'통합작성',
-      };
-      Object.keys(m).forEach(function(id) {
-        var el = document.getElementById(id), val = d[m[id]];
-        if (el && val) { el.value = val; if (el.tagName==='TEXTAREA') autoResize(el); }
+    fetch(url)
+      .then(function(r) { return r.text(); })
+      .then(function(text) {
+        var match = text.match(/^[^(]+\((.+)\)$/s);
+        var json = JSON.parse(match ? match[1] : text);
+        var d = json && json.student;
+        if (!d) { chip.textContent='대기 중'; chip.className='status-chip'; resolve(false); return; }
+        var m = {
+          f_job:'희망직업', f_jobreason:'1년목표',
+          c1s:'목적성보완', c2s:'근거성보완', c3s:'단계성보완', c4s:'공헌성보완',
+          w1_1:'계획1',
+          w1_2:'계획2',
+          w1_3:'계획3',
+          w2_1:'목표1',
+          w2_2:'목표2',
+          w3_1:'비전1',
+          w3_2:'비전2',
+          f_keywords:'단기목표메모', f_newexp:'중장기목표메모',
+          w_total:'통합작성',
+        };
+        Object.keys(m).forEach(function(id) {
+          var el = document.getElementById(id), val = d[m[id]];
+          if (el && val) { el.value = val; if (el.tagName==='TEXTAREA') autoResize(el); }
+        });
+        var checkKeys = ['목적성', '근거성', '단계성', '공헌성'];
+        ['c1','c2','c3','c4'].forEach(function(n, i) {
+          var val = d[checkKeys[i]];
+          if (val) { var r = document.querySelector('input[name="'+n+'"][value="'+val+'"]'); if(r) r.checked=true; }
+        });
+        if (d['희망직업']) document.getElementById('f_job2').value = d['희망직업'];
+        setSubmitted(); saveLocal(); resolve(true);
+      })
+      .catch(function() {
+        chip.textContent='대기 중'; chip.className='status-chip'; resolve(false);
       });
-      ['c1','c2','c3','c4'].forEach(function(n, i) {
-        var keys=['목적성','근거성','단계성','공헌성'];
-        var val = d[keys[i]];
-        if (val) { var r = document.querySelector('input[name="'+n+'"][value="'+val+'"]'); if(r) r.checked=true; }
-      });
-      if (d['희망직업']) document.getElementById('f_job2').value = d['희망직업'];
-      setSubmitted(); saveLocal(); resolve(true);
-    };
-    var sc = document.createElement('script');
-    sc.id = '_ss2';
-    sc.onerror = function() { chip.textContent='대기 중'; chip.className='status-chip'; resolve(false); };
-    sc.src = url;
-    document.body.appendChild(sc);
   });
 }
 

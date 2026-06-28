@@ -610,46 +610,48 @@ function loadFromSheets() {
   var chip = document.getElementById('statusChip');
   chip.textContent = '⏳ 불러오는 중...';
   return new Promise(function(resolve) {
-    var cb = '_cb' + Date.now();
     var url = SCRIPT_URL
-      + '?callback=' + cb
-      + '&grade='  + encodeURIComponent(params.get('grade')||'')
+      + '?grade='  + encodeURIComponent(params.get('grade')||'')
       + '&class='  + encodeURIComponent(params.get('class')||'')
       + '&number=' + encodeURIComponent(params.get('number')||'')
       + '&name='   + encodeURIComponent(params.get('name')||'')
-      + '&sheet='  + encodeURIComponent(SHEET_NAME)
+      + '&sheet=교내외활동'
       + '&t=' + Date.now();
-    window[cb] = function(json) {
-      delete window[cb];
-      var s = document.getElementById('_ss2'); if (s) s.remove();
-      var d = json && json.student;
-      if (!d) { chip.textContent='대기 중'; chip.className='status-chip'; resolve(false); return; }
-      var m = {
-        f_job:'희망직업', f_jobreason:'도움설명',
-        c1s:'직접성보완', c2s:'개념성보완', c3s:'의도성보완', c4s:'의미성보완', c5s:'연결성보완',
-        f_keywords:'활동목록', f_newexp:'역할배운점',
-        w1_1:'활동1', w1_2:'활동2',
-        w2_1:'역할1', w2_2:'역할2', w2_3:'역할3',
-        w3_1:'배운점1', w3_2:'배운점2',
-        w_total:'통합작성',
-      };
-      Object.keys(m).forEach(function(id) {
-        var el = document.getElementById(id), val = d[m[id]];
-        if (el && val) { el.value = val; if (el.tagName==='TEXTAREA') autoResize(el); }
+    fetch(url)
+      .then(function(r) { return r.text(); })
+      .then(function(text) {
+        var match = text.match(/^[^(]+\((.+)\)$/s);
+        var json = JSON.parse(match ? match[1] : text);
+        var d = json && json.student;
+        if (!d) { chip.textContent='대기 중'; chip.className='status-chip'; resolve(false); return; }
+        var m = {
+          f_job:'희망직업', f_jobreason:'도움설명',
+          c1s:'직접성보완', c2s:'개념성보완', c3s:'의도성보완', c4s:'의미성보완',
+          w1_1:'활동1',
+          w1_2:'활동2',
+          w2_1:'역할1',
+          w2_2:'역할2',
+          w2_3:'역할3',
+          w3_1:'배운점1',
+          w3_2:'배운점2',
+          f_keywords:'활동목록', f_newexp:'역할배운점',
+          w_total:'통합작성',
+        };
+        Object.keys(m).forEach(function(id) {
+          var el = document.getElementById(id), val = d[m[id]];
+          if (el && val) { el.value = val; if (el.tagName==='TEXTAREA') autoResize(el); }
+        });
+        var checkKeys = ['직접성', '개념성', '의도성', '의미성', '연결성'];
+        ['c1','c2','c3','c4'].forEach(function(n, i) {
+          var val = d[checkKeys[i]];
+          if (val) { var r = document.querySelector('input[name="'+n+'"][value="'+val+'"]'); if(r) r.checked=true; }
+        });
+        if (d['희망직업']) document.getElementById('f_job2').value = d['희망직업'];
+        setSubmitted(); saveLocal(); resolve(true);
+      })
+      .catch(function() {
+        chip.textContent='대기 중'; chip.className='status-chip'; resolve(false);
       });
-      ['c1','c2','c3','c4','c5'].forEach(function(n, i) {
-        var keys=['직접성','개념성','의도성','의미성','연결성'];
-        var val = d[keys[i]];
-        if (val) { var r = document.querySelector('input[name="'+n+'"][value="'+val+'"]'); if(r) r.checked=true; }
-      });
-      if (d['희망직업']) document.getElementById('f_job2').value = d['희망직업'];
-      setSubmitted(); saveLocal(); resolve(true);
-    };
-    var sc = document.createElement('script');
-    sc.id = '_ss2';
-    sc.onerror = function() { chip.textContent='대기 중'; chip.className='status-chip'; resolve(false); };
-    sc.src = url;
-    document.body.appendChild(sc);
   });
 }
 
