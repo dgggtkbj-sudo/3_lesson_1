@@ -460,25 +460,21 @@ body {
     <div class="write-body">
       <div class="write-block">
         <span class="write-tag" style="background:#3a9070;">1년 내 할 것·보완</span>
-        <div class="write-lines">
-          <input id="w1_1" class="write-line" type="text" placeholder="입사 후 1년 안에 구체적으로 무엇을 할 계획인가요?">
-          <input id="w1_2" class="write-line" type="text">
-          <input id="w1_3" class="write-line" type="text">
-        </div>
+        <textarea id="w1_1" class="write-line" rows="3" style="resize:none;line-height:1.8"
+          placeholder="입사 후 1년 안에 구체적으로 무엇을 할 계획인가요? (자유롭게 이어서 작성하세요)"
+          oninput="autoResize(this)"></textarea>
       </div>
       <div class="write-block">
         <span class="write-tag" style="background:#4070b8;">3~5년 목표</span>
-        <div class="write-lines">
-          <input id="w2_1" class="write-line" type="text" placeholder="3~5년 후에는 어떤 역할을 하고 싶나요?">
-          <input id="w2_2" class="write-line" type="text">
-        </div>
+        <textarea id="w2_1" class="write-line" rows="3" style="resize:none;line-height:1.8"
+          placeholder="3~5년 후에는 어떤 역할을 하고 싶나요? (자유롭게 이어서 작성하세요)"
+          oninput="autoResize(this)"></textarea>
       </div>
       <div class="write-block">
         <span class="write-tag" style="background:#7050b0;">10년 비전·기여</span>
-        <div class="write-lines">
-          <input id="w3_1" class="write-line" type="text" placeholder="10년 후 나의 비전과 회사에 대한 기여를 적어보세요">
-          <input id="w3_2" class="write-line" type="text">
-        </div>
+        <textarea id="w3_1" class="write-line" rows="3" style="resize:none;line-height:1.8"
+          placeholder="10년 후 나의 비전과 회사에 대한 기여를 적어보세요 (자유롭게 이어서 작성하세요)"
+          oninput="autoResize(this)"></textarea>
       </div>
     </div>
   </div>
@@ -555,12 +551,8 @@ function getFormData() {
     keywords:   document.getElementById('f_keywords').value,
     newexp:     document.getElementById('f_newexp').value,
     w1_1: document.getElementById('w1_1').value,
-    w1_2: document.getElementById('w1_2').value,
-    w1_3: document.getElementById('w1_3').value,
     w2_1: document.getElementById('w2_1').value,
-    w2_2: document.getElementById('w2_2').value,
     w3_1: document.getElementById('w3_1').value,
-    w3_2: document.getElementById('w3_2').value,
     w_total: document.getElementById('w_total').value,
   };
 }
@@ -580,9 +572,7 @@ function loadLocal() {
     f_job:'job', f_jobreason:'jobreason',
     c1s:'check1s', c2s:'check2s', c3s:'check3s', c4s:'check4s',
     f_keywords:'keywords', f_newexp:'newexp',
-    w1_1:'w1_1', w1_2:'w1_2', w1_3:'w1_3',
-    w2_1:'w2_1', w2_2:'w2_2',
-    w3_1:'w3_1', w3_2:'w3_2',
+    w1_1:'w1_1', w2_1:'w2_1', w3_1:'w3_1',
     w_total:'w_total',
   };
   Object.keys(map).forEach(function(id) {
@@ -622,13 +612,6 @@ function loadFromSheets() {
         var m = {
           f_job:'희망직업', f_jobreason:'1년목표',
           c1s:'목적성보완', c2s:'근거성보완', c3s:'단계성보완', c4s:'공헌성보완',
-          w1_1:'계획1',
-          w1_2:'계획2',
-          w1_3:'계획3',
-          w2_1:'목표1',
-          w2_2:'목표2',
-          w3_1:'비전1',
-          w3_2:'비전2',
           f_keywords:'단기목표메모', f_newexp:'중장기목표메모',
           w_total:'통합작성',
         };
@@ -636,6 +619,12 @@ function loadFromSheets() {
           var el = document.getElementById(id), val = d[m[id]];
           if (el && val) { el.value = val; if (el.tagName==='TEXTAREA') autoResize(el); }
         });
+        var w1 = [d['계획1'],d['계획2'],d['계획3']].filter(Boolean).join('\n');
+        if (w1) { var el1=document.getElementById('w1_1'); el1.value=w1; autoResize(el1); }
+        var w2 = [d['목표1'],d['목표2']].filter(Boolean).join('\n');
+        if (w2) { var el2=document.getElementById('w2_1'); el2.value=w2; autoResize(el2); }
+        var w3 = [d['비전1'],d['비전2']].filter(Boolean).join('\n');
+        if (w3) { var el3=document.getElementById('w3_1'); el3.value=w3; autoResize(el3); }
         var checkKeys = ['목적성', '근거성', '단계성', '공헌성'];
         ['c1','c2','c3','c4'].forEach(function(n, i) {
           var val = d[checkKeys[i]];

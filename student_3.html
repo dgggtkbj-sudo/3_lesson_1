@@ -464,25 +464,21 @@ body {
     <div class="write-body">
       <div class="write-block">
         <span class="write-tag" style="background:#4070b8;">활동 이름 + 기간</span>
-        <div class="write-lines">
-          <input id="w1_1" class="write-line" type="text" placeholder="어떤 활동을 언제 했나요?">
-          <input id="w1_2" class="write-line" type="text">
-        </div>
+        <textarea id="w1_1" class="write-line" rows="2" style="resize:none;line-height:1.8"
+          placeholder="어떤 활동을 언제 했나요? (자유롭게 이어서 작성하세요)"
+          oninput="autoResize(this)"></textarea>
       </div>
       <div class="write-block">
         <span class="write-tag" style="background:#3a9070;">내가 맡은 역할</span>
-        <div class="write-lines">
-          <input id="w2_1" class="write-line" type="text" placeholder="그 활동에서 내가 구체적으로 한 역할은?">
-          <input id="w2_2" class="write-line" type="text">
-          <input id="w2_3" class="write-line" type="text">
-        </div>
+        <textarea id="w2_1" class="write-line" rows="3" style="resize:none;line-height:1.8"
+          placeholder="그 활동에서 내가 구체적으로 한 역할은? (자유롭게 이어서 작성하세요)"
+          oninput="autoResize(this)"></textarea>
       </div>
       <div class="write-block">
         <span class="write-tag" style="background:#d06030;">배운점·느낀점 + 직무연결</span>
-        <div class="write-lines">
-          <input id="w3_1" class="write-line" type="text" placeholder="그 활동에서 무엇을 배웠고, 직무에 어떻게 도움이 될까요?">
-          <input id="w3_2" class="write-line" type="text">
-        </div>
+        <textarea id="w3_1" class="write-line" rows="3" style="resize:none;line-height:1.8"
+          placeholder="그 활동에서 무엇을 배웠고, 직무에 어떻게 도움이 될까요? (자유롭게 이어서 작성하세요)"
+          oninput="autoResize(this)"></textarea>
       </div>
     </div>
   </div>
@@ -560,12 +556,8 @@ function getFormData() {
     keywords:   document.getElementById('f_keywords').value,
     newexp:     document.getElementById('f_newexp').value,
     w1_1: document.getElementById('w1_1').value,
-    w1_2: document.getElementById('w1_2').value,
     w2_1: document.getElementById('w2_1').value,
-    w2_2: document.getElementById('w2_2').value,
-    w2_3: document.getElementById('w2_3').value,
     w3_1: document.getElementById('w3_1').value,
-    w3_2: document.getElementById('w3_2').value,
     w_total: document.getElementById('w_total').value,
   };
 }
@@ -585,9 +577,7 @@ function loadLocal() {
     f_job:'job', f_jobreason:'jobreason',
     c1s:'check1s', c2s:'check2s', c3s:'check3s', c4s:'check4s', c5s:'check5s',
     f_keywords:'keywords', f_newexp:'newexp',
-    w1_1:'w1_1', w1_2:'w1_2',
-    w2_1:'w2_1', w2_2:'w2_2', w2_3:'w2_3',
-    w3_1:'w3_1', w3_2:'w3_2',
+    w1_1:'w1_1', w2_1:'w2_1', w3_1:'w3_1',
     w_total:'w_total',
   };
   Object.keys(map).forEach(function(id) {
@@ -627,13 +617,6 @@ function loadFromSheets() {
         var m = {
           f_job:'희망직업', f_jobreason:'도움설명',
           c1s:'직접성보완', c2s:'개념성보완', c3s:'의도성보완', c4s:'의미성보완',
-          w1_1:'활동1',
-          w1_2:'활동2',
-          w2_1:'역할1',
-          w2_2:'역할2',
-          w2_3:'역할3',
-          w3_1:'배운점1',
-          w3_2:'배운점2',
           f_keywords:'활동목록', f_newexp:'역할배운점',
           w_total:'통합작성',
         };
@@ -641,6 +624,12 @@ function loadFromSheets() {
           var el = document.getElementById(id), val = d[m[id]];
           if (el && val) { el.value = val; if (el.tagName==='TEXTAREA') autoResize(el); }
         });
+        var w1 = [d['활동1'],d['활동2']].filter(Boolean).join('\n');
+        if (w1) { var el1=document.getElementById('w1_1'); el1.value=w1; autoResize(el1); }
+        var w2 = [d['역할1'],d['역할2'],d['역할3']].filter(Boolean).join('\n');
+        if (w2) { var el2=document.getElementById('w2_1'); el2.value=w2; autoResize(el2); }
+        var w3 = [d['배운점1'],d['배운점2']].filter(Boolean).join('\n');
+        if (w3) { var el3=document.getElementById('w3_1'); el3.value=w3; autoResize(el3); }
         var checkKeys = ['직접성', '개념성', '의도성', '의미성', '연결성'];
         ['c1','c2','c3','c4'].forEach(function(n, i) {
           var val = d[checkKeys[i]];
