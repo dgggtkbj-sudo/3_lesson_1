@@ -465,26 +465,21 @@ body {
     <div class="write-body">
       <div class="write-block">
         <span class="write-tag" style="background:#3a9070;">계기</span>
-        <div class="write-lines">
-          <input id="w1_1" class="write-line" type="text" placeholder="이 직무에 관심을 갖게 된 계기는?">
-          <input id="w1_2" class="write-line" type="text">
-          <input id="w1_3" class="write-line" type="text">
-        </div>
+        <textarea id="w1_1" class="write-line" rows="3" style="resize:none;line-height:1.8"
+          placeholder="이 직무에 관심을 갖게 된 계기는? (자유롭게 이어서 작성하세요)"
+          oninput="autoResize(this)"></textarea>
       </div>
       <div class="write-block">
         <span class="write-tag" style="background:#3870b0;">경험·변화</span>
-        <div class="write-lines">
-          <input id="w2_1" class="write-line" type="text" placeholder="그 후 어떤 경험을 통해 어떻게 변화했나요?">
-          <input id="w2_2" class="write-line" type="text">
-          <input id="w2_3" class="write-line" type="text">
-        </div>
+        <textarea id="w2_1" class="write-line" rows="3" style="resize:none;line-height:1.8"
+          placeholder="그 후 어떤 경험을 통해 어떻게 변화했나요? (자유롭게 이어서 작성하세요)"
+          oninput="autoResize(this)"></textarea>
       </div>
       <div class="write-block">
         <span class="write-tag" style="background:#d06030;">현재 나 + 직무 연결</span>
-        <div class="write-lines">
-          <input id="w3_1" class="write-line" type="text" placeholder="지금의 내 모습과 지원 직무를 연결하여 마무리해 보세요">
-          <input id="w3_2" class="write-line" type="text">
-        </div>
+        <textarea id="w3_1" class="write-line" rows="3" style="resize:none;line-height:1.8"
+          placeholder="지금의 내 모습과 지원 직무를 연결하여 마무리해 보세요 (자유롭게 이어서 작성하세요)"
+          oninput="autoResize(this)"></textarea>
       </div>
     </div>
   </div>
@@ -561,13 +556,8 @@ function getFormData() {
     keywords:   document.getElementById('f_keywords').value,
     newexp:     document.getElementById('f_newexp').value,
     w1_1: document.getElementById('w1_1').value,
-    w1_2: document.getElementById('w1_2').value,
-    w1_3: document.getElementById('w1_3').value,
     w2_1: document.getElementById('w2_1').value,
-    w2_2: document.getElementById('w2_2').value,
-    w2_3: document.getElementById('w2_3').value,
     w3_1: document.getElementById('w3_1').value,
-    w3_2: document.getElementById('w3_2').value,
     w_total: document.getElementById('w_total').value,
   };
 }
@@ -587,9 +577,7 @@ function loadLocal() {
     f_job:'job', f_jobreason:'jobreason',
     c1s:'check1s', c2s:'check2s', c3s:'check3s', c4s:'check4s', c5s:'check5s',
     f_keywords:'keywords', f_newexp:'newexp',
-    w1_1:'w1_1', w1_2:'w1_2', w1_3:'w1_3',
-    w2_1:'w2_1', w2_2:'w2_2', w2_3:'w2_3',
-    w3_1:'w3_1', w3_2:'w3_2',
+    w1_1:'w1_1', w2_1:'w2_1', w3_1:'w3_1',
     w_total:'w_total',
   };
   Object.keys(map).forEach(function(id) {
@@ -626,19 +614,26 @@ function loadFromSheets() {
         var json = JSON.parse(match ? match[1] : text);
         var d = json && json.student;
         if (!d) { chip.textContent='대기 중'; chip.className='status-chip'; resolve(false); return; }
+        // 기본 필드 매핑
         var m = {
           f_job:'희망직업', f_jobreason:'선택이유',
           c1s:'주도성보완', c2s:'일관성보완', c3s:'기준보완', c4s:'연결성보완', c5s:'발전성보완',
           f_keywords:'경험키워드', f_newexp:'새경험',
-          w1_1:'계기1', w1_2:'계기2', w1_3:'계기3',
-          w2_1:'변화1', w2_2:'변화2', w2_3:'변화3',
-          w3_1:'연결1', w3_2:'연결2',
           w_total:'통합작성',
         };
         Object.keys(m).forEach(function(id) {
           var el = document.getElementById(id), val = d[m[id]];
           if (el && val) { el.value = val; if (el.tagName==='TEXTAREA') autoResize(el); }
         });
+        // 계기: w1_1, w1_2, w1_3 합치기
+        var w1 = [d['계기1'],d['계기2'],d['계기3']].filter(Boolean).join('\n');
+        if (w1) { var el1=document.getElementById('w1_1'); el1.value=w1; autoResize(el1); }
+        // 경험변화: w2_1, w2_2, w2_3 합치기
+        var w2 = [d['변화1'],d['변화2'],d['변화3']].filter(Boolean).join('\n');
+        if (w2) { var el2=document.getElementById('w2_1'); el2.value=w2; autoResize(el2); }
+        // 직무연결: w3_1, w3_2 합치기
+        var w3 = [d['연결1'],d['연결2']].filter(Boolean).join('\n');
+        if (w3) { var el3=document.getElementById('w3_1'); el3.value=w3; autoResize(el3); }
         ['c1','c2','c3','c4','c5'].forEach(function(n, i) {
           var keys=['주도성','일관성','기준','연결성','발전성'];
           var val = d[keys[i]];
