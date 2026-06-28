@@ -617,7 +617,7 @@ function loadFromSheets() {
       + '&name='   + encodeURIComponent(params.get('name')||'')
       + '&sheet=교내외활동'
       + '&t=' + Date.now();
-    fetch(url)
+    fetch(url, { credentials: 'omit' })
       .then(function(r) { return r.text(); })
       .then(function(text) {
         var match = text.match(/^[^(]+\((.+)\)$/s);

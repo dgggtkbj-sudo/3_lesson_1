@@ -612,7 +612,7 @@ function loadFromSheets() {
       + '&name='   + encodeURIComponent(params.get('name')||'')
       + '&sheet=입사후포부'
       + '&t=' + Date.now();
-    fetch(url)
+    fetch(url, { credentials: 'omit' })
       .then(function(r) { return r.text(); })
       .then(function(text) {
         var match = text.match(/^[^(]+\((.+)\)$/s);

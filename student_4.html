@@ -614,7 +614,7 @@ function loadFromSheets() {
       + '&name='   + encodeURIComponent(params.get('name')||'')
       + '&sheet=지원동기'
       + '&t=' + Date.now();
-    fetch(url)
+    fetch(url, { credentials: 'omit' })
       .then(function(r) { return r.text(); })
       .then(function(text) {
         var match = text.match(/^[^(]+\((.+)\)$/s);
