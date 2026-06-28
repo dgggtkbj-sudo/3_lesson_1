@@ -309,6 +309,43 @@ body {
 .total-ta:focus { border-color: #3a9070; background: #f4fdf8; }
 .total-ta::placeholder { color: #b0ccc8; font-size: 12px; }
 
+
+/* ── 2단 작성 레이아웃 ── */
+.write-two-col {
+  margin: 10px 18px 0;
+  display: grid;
+  grid-template-columns: 4fr 1.5fr;
+  gap: 10px;
+  align-items: stretch;
+}
+.write-wrap { border: 1.5px solid #90ccc0; border-radius: 8px; overflow: hidden; }
+.preview-wrap {
+  border: 1.5px solid #b0c8e0; border-radius: 8px; overflow: hidden;
+  display: flex; flex-direction: column;
+}
+.preview-hdr {
+  background: linear-gradient(90deg, #b0c8e0, #c8d8ec);
+  padding: 7px 10px; font-size: 12px; font-weight: 800; color: #1a3050;
+  display: flex; align-items: center; justify-content: space-between; gap: 4px;
+}
+.preview-body { padding: 4px 8px 6px; background: #f6fafd; flex: 1; display: flex; flex-direction: column; }
+.preview-ta {
+  width: 100%; flex: 1;
+  border: 1px solid #c8dce8; border-radius: 7px;
+  background: #fff; font-size: 11.5px;
+  font-family: "Noto Sans KR", sans-serif;
+  color: #2a3a5a; line-height: 1.7; padding: 7px 9px;
+  outline: none; resize: none; pointer-events: none;
+  white-space: pre-wrap; min-height: 200px;
+}
+.btn-copy-all {
+  background: #3870b0; color: #fff; border: none;
+  padding: 3px 8px; border-radius: 12px; font-size: 11px;
+  font-weight: 700; cursor: pointer; font-family: "Noto Sans KR", sans-serif;
+  white-space: nowrap; transition: background .15s; flex-shrink: 0;
+}
+.btn-copy-all:hover { background: #2a5a9a; }
+.btn-copy-all.copied { background: #3a9070; }
 /* ── 인쇄 ── */
 @media print {
   body { background: none; padding: 0; }
@@ -453,42 +490,57 @@ body {
     </div>
   </div>
 
-  <!-- 나의 작성 -->
-  <div class="write-wrap">
-    <div class="write-hdr">
-      ✎ 나의 작성
-      <span class="write-sub">(희망 직업/직종/분야 :
-        <input id="f_job2" class="write-job-input" type="text" placeholder="직업/직종/분야">
-      )</span>
-    </div>
-    <div class="write-body">
-      <div class="write-block">
-        <span class="write-tag" style="background:#4070b8;">활동 이름 + 기간</span>
-        <textarea id="w1_1" class="write-line" rows="2" style="resize:none;line-height:1.8"
-          placeholder="어떤 활동을 언제 했나요? (자유롭게 이어서 작성하세요)"
-          oninput="autoResize(this)"></textarea>
-      </div>
-      <div class="write-block">
-        <span class="write-tag" style="background:#3a9070;">내가 맡은 역할</span>
-        <textarea id="w2_1" class="write-line" rows="3" style="resize:none;line-height:1.8"
-          placeholder="그 활동에서 내가 구체적으로 한 역할은? (자유롭게 이어서 작성하세요)"
-          oninput="autoResize(this)"></textarea>
-      </div>
-      <div class="write-block">
-        <span class="write-tag" style="background:#d06030;">배운점·느낀점 + 직무연결</span>
-        <textarea id="w3_1" class="write-line" rows="3" style="resize:none;line-height:1.8"
-          placeholder="그 활동에서 무엇을 배웠고, 직무에 어떻게 도움이 될까요? (자유롭게 이어서 작성하세요)"
-          oninput="autoResize(this)"></textarea>
-      </div>
-    </div>
-  </div>
+  <!-- 나의 작성 + 내용 모아보기 2단 -->
+  <div class="write-two-col">
 
+    <!-- 왼쪽: 나의 작성 -->
+    <div class="write-wrap">
+      <div class="write-hdr">
+        ✎ 나의 작성
+        <span class="write-sub">(희망 직업/직종/분야 :
+          <input id="f_job2" class="write-job-input" type="text" placeholder="직업/직종/분야">
+        )</span>
+      </div>
+      <div class="write-body">
+        <div class="write-block">
+          <span class="write-tag" style="background:#4070b8;">활동 이름 + 기간</span>
+          <textarea id="w1_1" class="write-line" rows="3" style="resize:none;line-height:1.8"
+            placeholder="활동 이름 + 기간 (자유롭게 이어서 작성하세요)"
+            oninput="autoResize(this);updatePreview()"></textarea>
+        </div>
+        <div class="write-block">
+          <span class="write-tag" style="background:#3a9070;">내가 맡은 역할</span>
+          <textarea id="w2_1" class="write-line" rows="3" style="resize:none;line-height:1.8"
+            placeholder="내가 맡은 역할 (자유롭게 이어서 작성하세요)"
+            oninput="autoResize(this);updatePreview()"></textarea>
+        </div>
+        <div class="write-block">
+          <span class="write-tag" style="background:#d06030;">배운점·느낀점 + 직무연결</span>
+          <textarea id="w3_1" class="write-line" rows="3" style="resize:none;line-height:1.8"
+            placeholder="배운점·느낀점 + 직무연결 (자유롭게 이어서 작성하세요)"
+            oninput="autoResize(this);updatePreview()"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- 오른쪽: 내용 모아보기 -->
+    <div class="preview-wrap">
+      <div class="preview-hdr">
+        📋 내용 모아보기
+        <button class="btn-copy-all" id="copyBtn" onclick="copyAll()">📋 복사</button>
+      </div>
+      <div class="preview-body">
+        <textarea id="previewArea" class="preview-ta" readonly
+          placeholder="왼쪽에 작성하면 여기에 자동으로 보여요"></textarea>
+      </div>
+    </div>
+
+  </div>
 
   <!-- 통합 작성칸 -->
   <div class="total-wrap">
-    <div class="total-hdr">✍️ 최종 통합 작성 — 자기소개서 완성본</div>
+    <div class="total-hdr">✍️ 최종 완성본</div>
     <div class="total-body">
-      <div class="total-label">위에서 작성한 내용을 참고하여, 자연스럽게 이어지는 하나의 글로 완성해 보세요.</div>
       <textarea id="w_total" class="total-ta" rows="6"
         placeholder="활동이름+기간, 역할, 배운점·느낀점+직무연결을 자연스럽게 이어서 작성해 보세요..."
         oninput="autoResize(this)"></textarea>
@@ -593,6 +645,7 @@ function loadLocal() {
     }
   });
   if (d.job) document.getElementById('f_job2').value = d.job;
+  updatePreview();
   return true;
 }
 
@@ -636,7 +689,7 @@ function loadFromSheets() {
           if (val) { var r = document.querySelector('input[name="'+n+'"][value="'+val+'"]'); if(r) r.checked=true; }
         });
         if (d['희망직업']) document.getElementById('f_job2').value = d['희망직업'];
-        setSubmitted(); saveLocal(); resolve(true);
+        setSubmitted(); saveLocal(); updatePreview(); resolve(true);
       })
       .catch(function() {
         chip.textContent='대기 중'; chip.className='status-chip'; resolve(false);
